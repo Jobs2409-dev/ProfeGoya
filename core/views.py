@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from django.shortcuts import render
 
 from .models import Project, Task
-from .serializers import ProjectSerializer, TaskSerializer
+from .serializers import *
  
  
 def health_check(request):

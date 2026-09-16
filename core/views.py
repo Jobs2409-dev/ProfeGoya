@@ -2,6 +2,10 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from rest_framework import viewsets
+from django.shortcuts import render
+
 from .models import Project, Task
 from .serializers import ProjectSerializer, TaskSerializer
  
@@ -22,4 +26,14 @@ def task_list(request):
     tasks = Task.objects.select_related("project").prefetch_related("tags").all()
     serializer = TaskSerializer(tasks, many=True)
     return Response(serializer.data)
+
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    
+class TasksViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.select_related("project").prefetch_related("tags").all()
+    serializer_class = TaskSerializer
+    
 

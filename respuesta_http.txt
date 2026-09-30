@@ -115,3 +115,5 @@ Content-Length: 53
 X-Content-Type-Options: nosniff
 Referrer-Policy: same-origin
 Cross-Origin-Opener-Policy: same-origin
+
+{"error":true,"detail":"Error interno del servidor."}

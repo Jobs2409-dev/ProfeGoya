@@ -26,33 +26,27 @@ class TaskSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # Validación que involucra más de un campo
-        if data.get("status") == "completada" and not data.get("due_date"):
+        # En un PATCH, data trae solo los campos enviados; lo que falte se toma de self.instance
+        instance = self.instance
+        status = data.get("status", instance.status if instance else None)
+        due_date = data.get("due_date", instance.due_date if instance else None)
+        project = data.get("project", instance.project if instance else None)
+
+        # Regla: completada exige due_date
+        if status == "completada" and not due_date:
             raise serializers.ValidationError(
                 "No se puede marcar una tarea como completada sin fecha límite registrada."
             )
-        # --- INICIO VALIDACIÓN TAREA ---
-        #    Obtenemos el status enviado en los datos; si no viene en la petición,
-        #    tomamos el status actual de la tarea desde self.instance.
-        status = data.get("status") or (self.instance.status if self.instance else None)
 
-        #    Obtenemos el proyecto asociado enviado en data; si no viene en la petición,
-        #    recuperamos el proyecto que ya tenía asignado la tarea (self.instance.project).
-        project = data.get("project") or (self.instance.project if self.instance else None)
-
-        #    Comprobamos la condición: solo evaluamos si el status resultante es "en_progreso"
-        #    y la tarea está vinculada a un proyecto.
-        if status == "en_progreso" and project:
-            #    Usamos el ORM a través de la relación inversa ('related_name="tasks"')
-            #    para filtrar si existe al menos una tarea del proyecto con status "completada".
-            has_completed_tasks = project.tasks.filter(status="completada").exists()
-
-            #   Si la consulta devuelve False (no hay ninguna completada), lanzamos el error de validación.
-            if not has_completed_tasks:
-                raise serializers.ValidationError(
-                    "Una tarea no puede estar en progreso si su proyecto no tiene ninguna tarea completada todavía."
-                )
-            
+        # Regla: en_progreso exige que el proyecto tenga al menos una completada
+        if status == "en_progreso":
+            if project:
+                hay_completadas = project.tasks.filter(status="completada").exists()
+                if not hay_completadas:
+                    raise serializers.ValidationError(
+                        "No se puede pasar a 'en_progreso' una tarea de un proyecto "
+                        "que todavía no tiene ninguna tarea completada."
+                    )
         return data
 
 

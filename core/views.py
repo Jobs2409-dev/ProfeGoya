@@ -8,6 +8,12 @@ from django.shortcuts import render
 
 from .models import Project, Task
 from .serializers import *
+
+
+# Temporal
+from rest_framework.decorators import action
+
+
  
  
 def health_check(request):
@@ -35,5 +41,9 @@ class ProjectViewSet(viewsets.ModelViewSet):
 class TasksViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.select_related("project").prefetch_related("tags").all()
     serializer_class = TaskSerializer
+    
+    @action(detail=False, methods=["get"])
+    def romper(self, request):
+        return 1 / 0  # Provoca ZeroDivisionError a propósito
     
 

@@ -2,14 +2,14 @@
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
-from .models import Task
+from .models import *
 from .repositories import TaskRepository
 
 import requests
 from django.core.cache import cache
 
 
-class TaskServices:
+class TaskService:
     @staticmethod
     def mark_completed(task: Task) -> Task:
         # Misma regla de negocio que taskserializers.validate (clase 4)
@@ -24,8 +24,10 @@ class TaskServices:
     def tasks_overdue(queryset=None):
         if queryset is None:
             queryset = TaskRepository.get_queryset()
-            today = timezone.now.date()
-            return queryset.filter(due_date_It=today).exclude(status="completada")
+        
+        today = timezone.now().date()  # Agregados ()
+        # Cambiado due_date_It a due_date__lt
+        return queryset.filter(due_date__lt=today).exclude(status="completada")
         
         
 
@@ -51,3 +53,17 @@ class HolidayService:
     @classmethod
     def is_holiday(cls, some_date) -> bool:
         return str(some_date) in cls.get_holidays(some_date.year)
+    
+    
+class MembershipService:
+    @staticmethod
+    def is_member(user, project) -> bool:
+        return ProjectMembership.objects.filter(project=project, user=user).exists()
+ 
+    @staticmethod
+    def is_admin(user, project) -> bool:
+        return ProjectMembership.objects.filter(project=project, user=user, role="admin").exists()
+ 
+    @staticmethod
+    def projects_for(user):
+        return Project.objects.filter(memberships__user=user).distinct().order_by("id")

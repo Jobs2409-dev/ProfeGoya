@@ -5,3 +5,4 @@ from .models import *
 admin.site.register(Task)
 admin.site.register(Project)
 admin.site.register(Tag)
+admin.site.register(ProjectMembership)

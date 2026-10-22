@@ -1,4 +1,6 @@
 # core/serializers.py
+import nh3
+
 from datetime import date
 from rest_framework import serializers
 from .models import Project, Task, Tag
@@ -57,6 +59,9 @@ class TaskSerializer(serializers.ModelSerializer):
                         "que todavía no tiene ninguna tarea completada."
                     )
         return data
+    
+    def validate_descriptions(self, value):
+        return nh3.clean(value, tags=set())
 
 
 class ProjectSerializer(serializers.ModelSerializer):

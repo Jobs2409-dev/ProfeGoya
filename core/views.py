@@ -1,4 +1,6 @@
 # core/views.py
+import logging
+
 from django.http import JsonResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
@@ -15,13 +17,16 @@ from rest_framework import generics, permissions
 from .serializers_auth import RegisterSerializer
 
 from .permissions import IsProjectAdminOrReadOnly
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from django.db import transaction
 
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 
+from .throttles import LoginRateThrottle
 
+security_logger = logging.getLogger("security")
 
 def health_check(request):
     return JsonResponse({"status": "ok", "service": "TaskFlow API"})
@@ -104,3 +109,16 @@ class SocialLoginJWTView(APIView):
         refresh = RefreshToken.for_user(request.user)
         return Response({"refresh": str(refresh), "access": str(refresh.access_token)})
     
+
+class ThrottledTokenObtainPairView(TokenObtainPairView):
+    throttle_classes = [LoginRateThrottle]
+ 
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except AuthenticationFailed:
+            ip = request.META.get("REMOTE_ADDR")
+            username = request.data.get("username", "")
+            SecurityLog.objects.create(action="login_failed", detail=f"usuario={username}", ip_address=ip)
+            security_logger.warning(f"Login fallido para usuario {username} desde {ip}")
+            raise

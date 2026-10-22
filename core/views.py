@@ -57,7 +57,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            project_memberships_user=self.request.user
+            project__memberships__user=self.request.user
         ).distinct()
  
  
@@ -104,6 +104,7 @@ class SocialLoginJWTView(APIView):
     de Django. Esta vista toma ese usuario y le entrega un par de JWT propios,
     los mismos que devuelve /api/token/ (Clase 6).
     """
+    permission_classes = [IsAuthenticated]
  
     def get(self, request):
         refresh = RefreshToken.for_user(request.user)

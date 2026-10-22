@@ -1,0 +1,58 @@
+Cuando un miembro del proyecto intenta modificar un proyecto
+-> Respuesta del postman:
+    PATCH http://127.0.0.1:8000/api/projects/2/
+
+    Body:
+
+        {
+        "name": "Proyecto modificado por un miembro real (no es admin)"
+        }
+
+    Respuesta:
+
+        {
+        "error": true,
+            "detail": {
+                "detail": "You do not have permission to perform this action."
+            }
+        }
+
+Respuesta:
+Un usuario que no es mimebro del proyecto nunca llega a ejecutar la validación
+de permisos a nivel global de objeto porque el método 
+get_queryset() de la ViewSets filtra las consultas en la abse de datos
+utilizando exclusivamente las memebresías del usuario autenticado.
+
+Al intentar acceder a un ID de proyecto o tarea del cual no es miembro, la
+consulta no retorna ningún registro.Como consecuencia, Django REST framework
+responde automáticamente con un error 404 Not Found en lasfases pervias 
+del ciclo de vida de la petición, impidiendo que el flujo llegue a la
+capa de evaluación de permisis a nivel objetos.
+
+
+2: DIFERENCIA ENTRE CORS_ALLOWED_ORIGINS Y CORS_ALLOW_CREDENTIALS
+    * CORS_ALLOWED_ORIGINS -> Define la lista explicita de orígenes 
+    autorizados (esquema, dominio y puerto) desde los cuales un navegador
+    tiene permitido realizar peticiones HTTP hacia la API Backend.
+        Por ejemplo: ["http://localhost:3000", "https://mi-frontend.com"]
+    
+    * CORS_ALLOW_CREDENTIALS -> Es el valor booleano que indica al navegador
+    si la API permite el intercambio de credenciales cross-origin en las 
+    peticiones HTTP. Estas credenciales incluyen cookies de sesión, 
+    cabecera de autorización HTTP o certificadis SSL del cliente.
+
+2.2: ¿En qué escenario se necesita CORS_ALLOW_CREDENTIALS?
+    Se necita cuando la apllicación cliente y e servidor backend se
+    encuentra alojados en dominios o puertos diferentes, y la autenticación
+    se maneja enviando cookies HTTP-Only o enviandoi credenciales de forma
+    explicita en cada petición AJAX.
+
+    En ese escenario:
+    El cliente frontend debe configurar sus peticiones habilitando la 
+    opción withCredentials: true (en Axios) o credentials: 'include' 
+    (en la Fetch API).
+
+    Para que el navegador acepte la respuesta y permita leer los datos, 
+    el servidor backend DEBE responder con la cabecera 
+    Access-Control-Allow-Credentials: true configurando 
+    CORS_ALLOW_CREDENTIALS = True.

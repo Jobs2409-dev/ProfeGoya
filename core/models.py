@@ -65,5 +65,5 @@ class SecurityLog(models.Model):
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
  
-    def _str_(self):
+    def __str__(self):
         return f"{self.created_at:%Y-%m-%d %H:%M} {self.action} ({self.ip_address})"

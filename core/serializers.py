@@ -60,9 +60,9 @@ class TaskSerializer(serializers.ModelSerializer):
                     )
         return data
     
-    def validate_descriptions(self, value):
-        return nh3.clean(value, tags=set())
-
+    def validate_description(self, value):
+        return nh3.clean(value, tags=set()) if value else value
+    
 
 class ProjectSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)

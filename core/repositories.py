@@ -5,7 +5,7 @@ class TaskRepository:
     @staticmethod
     def get_queryset():
         return (
-            Task.objects.select_for_update("project")
+            Task.objects.select_related("project")
             .prefetch_related("tags")
             .order_by("-created_at")
         )

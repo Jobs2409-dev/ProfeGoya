@@ -1,0 +1,37 @@
+2. COMANDOS DE PRUEBA UTILIZADOS (CLIENTE)
+# Prueba 1: Conexión a proyecto existente (ID: 1)
+python -c "import websocket; ws = websocket.create_connection('ws://127.0.0.1:8000/ws/projects/1/'); ws.send('{\"mensaje\": \"hola\"}'); print(ws.recv()); ws.close()"
+
+# Prueba 2: Conexión a proyecto inexistente (ID: 99999)
+python -c "import websocket; ws = websocket.create_connection('ws://127.0.0.1:8000/ws/projects/99999/')"
+
+(.venv) C:\Users\jonat\OneDrive\Desktop\Programación 4 - Goya>python manage.py runserver
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+October 28, 2026 - 15:09:30
+Django version 6.1, using settings 'config.settings'
+Starting ASGI/Daphne version 4.2.3 development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+
+# Resultado Prueba 1 (Proyecto id=1 existente):
+WebSocket HANDSHAKING /ws/projects/1/ [127.0.0.1:51817]
+WebSocket CONNECT /ws/projects/1/ [127.0.0.1:51817]
+WebSocket DISCONNECT /ws/projects/1/ [127.0.0.1:51817]
+
+# Resultado Prueba 2 (Proyecto id=99999 inexistente):
+WebSocket HANDSHAKING /ws/projects/99999/ [127.0.0.1:51820]
+WebSocket REJECT /ws/projects/99999/ [127.0.0.1:51820]
+WebSocket DISCONNECT /ws/projects/99999/ [127.0.0.1:51820]
+
+
+- Las trazas de Daphne confirman que el handshake, la conexión y la 
+  desconexión funcionan.
+
+  TAREA: 
+ Las trazas de Daphne confirman que la validación asíncrona mediante 
+ `database_sync_to_async` funciona correctamente:
+- Si el proyecto existe (id=1), se acepta la conexión (WebSocket CONNECT).
+- Si el proyecto no existe (id=99999), el servidor ejecuta `await 
+  self.close()` rechazando la conexión de inmediato (WebSocket REJECT).

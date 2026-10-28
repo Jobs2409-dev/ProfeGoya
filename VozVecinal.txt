@@ -1,0 +1,12 @@
+Ficha de Integrantes del Equipo
+
+Nombre del Equipo: Dev
+Modalidad: Unipersonal
+Integrante
+Nombre: Jonathan De Jesús Obregón
+Rol / Especialidad: Full-Stack Developer & Creador de Contenido
+Superpoder / Habilidades clave:
+Desarrollo de software multiplataforma (Django, Node.js, Express, WebSockets/Channels, PySide6, Flutter, MySQL/MongoDB).
+Autogestión, resolución eficiente de problemas.
+Intereses y Gustos:
+Desarrollo backend y arquitectura en tiempo real.

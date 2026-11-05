@@ -13,3 +13,21 @@ WebSocket HANDSHAKING /ws/projects/1/ [127.0.0.1:59973]
 WebSocket CONNECT /ws/projects/1/ [127.0.0.1:59973]
 WebSocket DISCONNECT /ws/projects/1/ [127.0.0.1:59973]
 
+
+Redis Pub/Sub: Es un modelo de mensajería en vivo sin persistencia 
+(at-most-once). Los mensajes se entregan instantáneamente a las 
+conexiones WebSocket activas en ese milisegundo; si un cliente está 
+desconectado, el mensaje se pierde. Es ligero, corre totalmente en 
+memoria y es la opción ideal para Channel Layers, notificaciones 
+inmediatas y sistemas de presencia (como el puntito online/offline).
+
+Apache Kafka: Es un registro distribuido de eventos (Event Log) con 
+persistencia en disco a largo plazo (días, meses o indefinido). Soporta 
+lecturas históricas, reprocesamiento de eventos por parte de múltiples 
+consumidores independientes e imponen garantías de entrega más estrictas 
+(at-least-once). Es ideal para sistemas financieros, analítica de datos a 
+gran escala y arquitecturas donde no se puede perder ningún mensaje.
+
+Conclusión en TaskFlow: Redis es suficiente y óptimo porque los datos 
+duraderos viven en PostgreSQL/MySQL vía la API REST, y la capa en vivo 
+solo notifica cambios de estado en tiempo real a los navegadores activos.

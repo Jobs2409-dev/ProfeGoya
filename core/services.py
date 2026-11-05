@@ -83,7 +83,27 @@ class NotificationService:
             "task_id": task.id,
             "title": task.title,
         })
+        
+    @staticmethod
+    def notify_task_updated(task):
+        NotificationService._send(task.project_id, {
+            "event": "task_updated",
+            "task_id": task.id,
+            "title": task.title,
+            "status": task.status,
+        })
+
+    @staticmethod
+    def notify_task_completed(task):
+        NotificationService._send(task.project_id, {
+            "event": "task_completed",
+            "task_id": task.id,
+            "title": task.title,
+            "status": task.status,
+        })
  
+
+
     @staticmethod
     def _send(project_id, payload):
         channel_layer = get_channel_layer()

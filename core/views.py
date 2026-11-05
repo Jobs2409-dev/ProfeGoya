@@ -92,6 +92,28 @@ class TaskViewSet(viewsets.ModelViewSet):
         if page is not None:
             return self.get_paginated_response(self.get_serializer(page, many=True).data)
         return Response(self.get_serializer(tasks, many=True).data)
+    
+    def perform_create(self, serializer):
+        self.check_project_admin(serializer.validated_data["project"])
+        task = serializer.save(owner=self.request.user)
+        NotificationService.notify_task_created(task)
+
+    def perform_update(self, serializer):
+        self.check_project_admin(serializer.validated_data.get("project", serializer.instance.project))
+        task = serializer.save()
+        NotificationService.notify_task_updated(task)
+
+    @action(detail=True, methods=["post"])
+    def complete(self, request, pk=None):
+        task = self.get_object()
+        self.check_project_admin(task.project)
+        
+        # Lógica para marcar como completada
+        task.status = "completed"
+        task.save()
+        
+        NotificationService.notify_task_completed(task)
+        return Response({"status": "task completed"}, status=status.HTTP_200_OK)
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()

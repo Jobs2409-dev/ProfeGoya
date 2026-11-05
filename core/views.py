@@ -68,7 +68,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         self.check_project_admin(serializer.validated_data["project"])
-        serializer.save(owner=self.request.user)
+        task = serializer.save(owner=self.request.user)
+        NotificationService.notify_task_created(task)
+
  
  
     def perform_update(self, serializer):

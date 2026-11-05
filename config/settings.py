@@ -196,7 +196,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT ={
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=800),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
 }
@@ -223,9 +223,8 @@ LOGGING = {
     },
 }
 
-
-CHANNEL_LAYERS = {
+CHANNEL_LAYERS={
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer",
-    }
+    },
 }
